@@ -19,6 +19,6 @@ Chrome + [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/d
 ## 更新履歴
 * v1.1 2015-12-30
   - デフォルトでループ再生するように
-	- ページを開いた時のメモリ消費を改善
+  - ページを開いた時のメモリ消費を改善
 * v1.0 2015-12-29
   - 公開
