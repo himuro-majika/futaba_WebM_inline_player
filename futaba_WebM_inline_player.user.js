@@ -5,7 +5,7 @@
 // @author      himuro_majika
 // @include     http://may.2chan.net/webm/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @version     1.1
+// @version     1.2
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -110,7 +110,5 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			});
 		}
 	}
-	
-	
 
 })(jQuery);
