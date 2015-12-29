@@ -19,6 +19,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	 */
 	// ループ再生を有効にする
 	var USE_LOOP = true;
+	// 自動再生を有効にする
+	var USE_AUTOPLAY = true;
 	
 	
 	init();
@@ -90,6 +92,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				var $video = $("<video>", {
 					controls: "",
 					loop: USE_LOOP,
+					autoplay: USE_AUTOPLAY,
 					class: "GM_fwip_player",
 					css: {
 						"width": width,
