@@ -66,7 +66,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					add_class_res_inserted($nodes);
 				});
 			});
-			observer.observe(target, { childList: true });
+			observer.observe(target, { childList: true });			// TODO:動いてない
 		}
 		// 挿入されたレスに属性を付加
 		function add_class_res_inserted($nodes) {
@@ -92,26 +92,23 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"width": width,
 					"height": height,
 					"text-align": "left",
-					"margin" : "0 20px",
+					"margin": "0 20px",
+					"float": "left",
 				},
 			}).append(
 				$("<source>", {
 					src: href,
 					type: "video/webm",
-					css: {
-					}
 				})
 			);
-			// サムネイル画像を隠す
-			node.hide();
-			node.parent().attr("href","");
-			node.parent().append($video);
-			
-		}
-		// ノードからfancyboxクラス、属性を削除
-		function removeAttr(node) {
-			node.removeClass("futaba_lightbox");
-			node.attr("rel", "");
+			// マウスオーバーで読み込み
+			node.hover(function(){
+				// サムネイル画像を隠す
+				node.hide();
+				// node.parent().attr("href","");
+				// node.parent().append($video);
+				node.parent().replaceWith($video);
+			});
 		}
 	}
 	
