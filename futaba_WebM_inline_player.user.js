@@ -5,7 +5,7 @@
 // @author      himuro_majika
 // @include     http://may.2chan.net/webm/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @version     1.0
+// @version     1.1
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -14,6 +14,13 @@
 this.$ = this.jQuery = jQuery.noConflict(true);
 
 (function ($) {
+	/**
+	 * 設定
+	 */
+	// ループ再生を有効にする
+	var USE_LOOP = false;
+	
+	
 	init();
 	function init() {
 		var AKAHUKU = false, FUTAKURO = false;
@@ -48,13 +55,14 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			var target = $("html > body > form[action]:not([enctype])").get(0);
 			var observer = new MutationObserver(function(mutations) {
 				mutations.forEach(function(mutation) {
+					console.log(mutation);
 					var $nodes = $(mutation.addedNodes);
 					replaceNodeInserted($nodes);
 				});
 			});
 			observer.observe(target, { childList: true });
 		}
-		// 挿入されたレスに属性を付加
+		// 挿入されたレス
 		function replaceNodeInserted($nodes) {
 			var $res_inserted = $nodes.find("td > a > img");
 			if ($res_inserted.length) {
@@ -71,25 +79,25 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			var width = node.attr("width");
 			var height = node.attr("height");
-			var $video = $("<video>", {
-				controls: "controls",
-				// hspace: "20",
-				class: "GM_fwip_player",
-				css: {
-					"width": width,
-					"height": height,
-					"margin": "0 20px",
-					"float": "left",
-					"clear": "left",
-				},
-			}).append(
-				$("<source>", {
-					src: href,
-					type: "video/webm",
-				})
-			);
 			// マウスオーバーで読み込み
 			node.hover(function(){
+				var $video = $("<video>", {
+					controls: "",
+					loop: USE_LOOP,
+					class: "GM_fwip_player",
+					css: {
+						"width": width,
+						"height": height,
+						"margin": "0 20px",
+						"float": "left",
+						"clear": "left",
+					},
+				}).append(
+					$("<source>", {
+						src: href,
+						type: "video/webm",
+					})
+				);
 				// サムネイル画像を隠す
 				node.hide();
 				// node.parent().attr("href","");
