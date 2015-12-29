@@ -6,13 +6,14 @@
 動画にマウスを乗せると動作します。
 
 Firefox + [Greasemonkey](https://addons.mozilla.org/ja/firefox/addon/greasemonkey/),  
+Chrome + [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo),  
 で動作確認済みです
 
 ※このUserscriptは[赤福Firefox SP](http://toshiakisp.github.io/akahuku-firefox-sp/)に対応しています  
 ※ふたクロには今後対応予定  
 
 ## 使い方
-動画にマウスを乗せると動作します。
+動画のサムネイルにマウスを乗せると動作します。
 
 
 ## 更新履歴
