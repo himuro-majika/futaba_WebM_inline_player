@@ -18,7 +18,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	 * 設定
 	 */
 	// ループ再生を有効にする
-	var USE_LOOP = false;
+	var USE_LOOP = true;
 	
 	
 	init();
@@ -55,7 +55,6 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			var target = $("html > body > form[action]:not([enctype])").get(0);
 			var observer = new MutationObserver(function(mutations) {
 				mutations.forEach(function(mutation) {
-					console.log(mutation);
 					var $nodes = $(mutation.addedNodes);
 					replaceNodeInserted($nodes);
 				});
@@ -64,14 +63,21 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		}
 		// 挿入されたレス
 		function replaceNodeInserted($nodes) {
-			var $res_inserted = $nodes.find("td > a > img");
-			if ($res_inserted.length) {
-				replaceNode($res_inserted);
+			var $res_inserted;
+			if (AKAHUKU) {
+				$res_inserted = $nodes.find("td > a > img");
+				if ($res_inserted.length) {
+					replaceNode($res_inserted);
+				}
+			} else if (FUTAKURO) {
+				$res_inserted = $nodes.find("td > a > img");
+				$res_inserted.each(function(){
+					replaceNode($(this));
+				});
 			}
 		}
 		// ノードの書き換え
 		function replaceNode(node) {
-			// console.log(node);
 			var href = node.parent().attr("href");
 			if (!href.match(/\.webm$/)) {
 				// 拡張子.webm以外
@@ -100,8 +106,6 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				);
 				// サムネイル画像を隠す
 				node.hide();
-				// node.parent().attr("href","");
-				// node.parent().append($video);
 				node.parent().replaceWith($video);
 			});
 		}
