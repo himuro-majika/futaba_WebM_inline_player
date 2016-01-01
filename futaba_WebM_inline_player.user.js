@@ -21,6 +21,10 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_LOOP = true;
 	// 自動再生を有効にする
 	var USE_AUTOPLAY = true;
+	// コントロールを表示する
+	var USE_CONTROLS = true;
+	// ミュート状態で再生する
+	var USE_MUTED = false;
 	
 	
 	init();
@@ -65,14 +69,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		}
 		// 挿入されたレス
 		function replaceNodeInserted($nodes) {
-			var $res_inserted;
+			var $res_inserted = $nodes.find("td > a > img");
 			if (AKAHUKU) {
-				$res_inserted = $nodes.find("td > a > img");
 				if ($res_inserted.length) {
 					replaceNode($res_inserted);
 				}
 			} else if (FUTAKURO) {
-				$res_inserted = $nodes.find("td > a > img");
 				$res_inserted.each(function(){
 					replaceNode($(this));
 				});
@@ -87,30 +89,100 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			var width = node.attr("width");
 			var height = node.attr("height");
+			var $video;
 			// マウスオーバーで読み込み
 			node.hover(function(){
-				var $video = $("<video>", {
-					controls: "",
-					loop: USE_LOOP,
-					autoplay: USE_AUTOPLAY,
-					class: "GM_fwip_player",
+				if (USE_AUTOPLAY) {
+					addFullPlayer();
+				} else {
+					addMiniPlayer();
+				}
+			},function(){
+				if (USE_AUTOPLAY) {
+					removeFullPlayer();
+				}
+			});
+			// フルプレイヤー
+			function addFullPlayer() {
+				var $video_container = $(".GM_fwip_container_full");
+				if ($video_container.length){
+					$video_container.remove();
+				}
+				var offset = parseInt(node.offset().left) + parseInt(width);
+				$video = $("<div>", {
+					class: "GM_fwip_container_full",
 					css: {
-						"width": width,
-						"height": height,
 						"margin": "0 20px",
 						"float": "left",
 						"clear": "left",
-					},
+						"position": "fixed",
+						"top": "20px",
+						"right": "0px",
+						// "border": "5px solid #333",
+						// "border-radius": "5px",
+						"box-shadow": "0 0 10px 5px rgba(0,0,0,0.5)",
+						"z-index": "2000000013",
+					}
 				}).append(
-					$("<source>", {
-						src: href,
-						type: "video/webm",
-					})
+					$("<video>", {
+						class: "GM_fwip_player",
+						css: {
+							"width": "auto",
+							"height": "auto",
+							"max-width": "calc(100vw - " + offset + "px - 40px)",
+							"max-height": "calc(100vh - 40px)",
+						},
+					}).prop({
+						// controls: USE_CONTROLS,
+						autoplay: USE_AUTOPLAY,
+						loop: USE_LOOP,
+						muted: USE_MUTED,
+						preload: true,
+					}).append(
+						$("<source>", {
+							src: href,
+							type: "video/webm",
+						})
+					)
+				);
+				node.parent().before($video);
+			}
+			// ミニプレイヤー
+			function addMiniPlayer() {
+				$video = $("<div>", {
+					class: "GM_fwip_container_mini",
+					css: {
+						"margin": "0 20px",
+						"float": "left",
+						"clear": "left",
+					}
+				}).append(
+					$("<video>", {
+						class: "GM_fwip_player",
+						css: {
+							"width": width,
+							"height": height,
+						},
+					}).prop({
+						controls: USE_CONTROLS,
+						autoplay: USE_AUTOPLAY,
+						loop: USE_LOOP,
+						muted: USE_MUTED,
+					}).append(
+						$("<source>", {
+							src: href,
+							type: "video/webm",
+						})
+					)
 				);
 				// サムネイル画像を隠す
 				node.hide();
-				node.parent().replaceWith($video);
-			});
+				node.parent().before($video);
+			}
+			function removeFullPlayer() {
+				var $video_container = $(".GM_fwip_container_full");
+				$video_container.remove();
+			}
 		}
 	}
 
