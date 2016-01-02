@@ -27,6 +27,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_CONTROLS = true;
 	// ミュート状態で再生する
 	var USE_MUTED = false;
+	// フルサイズプレーヤーに時間を表示する
+	var USE_TIME_DISPLAY = true;
 	
 	
 	init();
@@ -91,7 +93,6 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			var width = node.attr("width");
 			var height = node.attr("height");
-			var $video = $();
 			var timer;
 			// マウスオーバーで読み込み
 			node.hover(function(){
@@ -110,7 +111,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			});
 			// ミニプレイヤー
 			function addMiniPlayer() {
-				$video = $("<div>", {
+				var $videoContainer = $("<div>", {
 					class: "GM_fwip_container_mini",
 					css: {
 						"margin": "0 20px",
@@ -138,14 +139,14 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				);
 				// サムネイル画像を隠す
 				node.hide();
-				node.parent().before($video);
+				node.parent().before($videoContainer);
 			}
 			// フルプレイヤーを表示する
 			function showFullPlayer() {
 				hideFullPlayer();
 				// サムネ右端のオフセット
 				var offset = parseInt(node.offset().left) + parseInt(width);
-				$video = $("<div>", {
+				var $videoContainer = $("<div>", {
 					class: "GM_fwip_container_full",
 					css: {
 						"background-color": "#000",
@@ -157,59 +158,63 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						"box-shadow": "0 0 10px 5px rgba(0,0,0,0.5)",
 						"z-index": "2000000013",
 					}
+				});
+				var $videoPlayer = $("<video>", {
+					class: "GM_fwip_player",
+					css: {
+						"width": "auto",
+						"height": "auto",
+						"max-width": $(window).width() - offset - 40,
+						"max-height": $(window).height() - 40,
+					},
+				}).prop({
+					autoplay: true,
+					loop: USE_LOOP,
+					muted: USE_MUTED,
+					preload: true,
 				}).append(
-					$("<video>", {
-						class: "GM_fwip_player",
-						css: {
-							"width": "auto",
-							"height": "auto",
-							"max-width": $(window).width() - offset - 40,
-							"max-height": $(window).height() - 40,
+					$("<source>", {
+						src: href,
+						type: "video/webm",
+						error: function() {
+							// ソースの読み込み失敗イベント
+							onerror();
 						},
-					}).on("loadedmetadata", function(){
+					})
+				);
+				$videoContainer.append($videoPlayer);
+				if (USE_TIME_DISPLAY) {
+					$videoPlayer.on("loadedmetadata", function(){
 						// メタデータ読み込み完了イベント
 						showDuration($(this).get(0));
 					}).on("timeupdate", function() {
 						// 再生位置変更イベント
 						showCurrentTime($(this).get(0));
-					}).prop({
-						autoplay: true,
-						loop: USE_LOOP,
-						muted: USE_MUTED,
-						preload: true,
-					}).append(
-						$("<source>", {
-							src: href,
-							type: "video/webm",
-							error: function() {
-								// ソースの読み込み失敗イベント
-								onerror();
-							},
-						})
-					)
-				).append(
-					$("<div>", {
-						class: "GM_fwip_time_container",
-						css: {
-							"font-size": "6pt",
-							"font-family": "arial,helvetica,sans-serif",
-							postion: "relative",
-							"text-align": "right",
-							color: "#fff",
-						}
-					}).append(
-						$("<span>", {
-							class: "GM_fwip_time_current"
-						})
-					).append(
-						$("<span>").text("/")
-					).append(
-						$("<span>", {
-							class: "GM_fwip_time_duration",
-						})
-					)
-				);
-				$("body").append($video);
+					});
+					$videoContainer.append(
+						$("<div>", {
+							class: "GM_fwip_time_container",
+							css: {
+								"font-size": "6pt",
+								"font-family": "arial,helvetica,sans-serif",
+								postion: "relative",
+								"text-align": "right",
+								color: "#fff",
+							}
+						}).append(
+							$("<span>", {
+								class: "GM_fwip_time_current"
+							})
+						).append(
+							$("<span>").text("/")
+						).append(
+							$("<span>", {
+								class: "GM_fwip_time_duration",
+							})
+						)
+					);
+				}
+				$("body").append($videoContainer);
 				// 動画の長さを表示する
 				function showDuration(video) {
 					var webm_duration = parseTime(video.duration);
@@ -222,8 +227,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				}
 				// エラー表示
 				function onerror() {
-					$video.children().remove();
-					$video.append(
+					$videoContainer.children().remove();
+					$videoContainer.append(
 						$("<p>", {
 							text: "動画が読み込めませんでした",
 							class: "GM_fwip_error",
