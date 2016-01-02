@@ -97,7 +97,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			node.hover(function(){
 				if (USE_FULLPLAYER) {
 					timer = setTimeout(function(){
-						addFullPlayer();
+						showFullPlayer();
 					}, 300);
 				} else {
 					addMiniPlayer();
@@ -105,7 +105,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			},function(){
 				if (USE_FULLPLAYER) {
 					clearTimeout(timer);
-					removeFullPlayer();
+					hideFullPlayer();
 				}
 			});
 			// ミニプレイヤー
@@ -141,7 +141,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				node.parent().before($video);
 			}
 			// フルプレイヤー
-			function addFullPlayer() {
+			function showFullPlayer() {
 				if ($video.length) {
 					$video.remove();
 				}
@@ -168,6 +168,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 							"max-width": $(window).width() - offset - 40,
 							"max-height": $(window).height() - 40,
 						},
+					}).on("loadedmetadata", function(){
+						// メタデータ読み込み完了イベント
+						showDuration($(this).get(0));
+					}).on("timeupdate", function() {
+						// 再生位置変更イベント
+						showCurrentTime($(this).get(0));
 					}).prop({
 						autoplay: true,
 						loop: USE_LOOP,
@@ -178,29 +184,73 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 							src: href,
 							type: "video/webm",
 							error: function() {
-								$video.children().remove();
-								$video.append(
-									$("<p>", {
-										text: "動画が読み込めませんでした",
-										class: "GM_fwip_error",
-										css: {
-											"text-align": "center",
-											"background-color": "#fff",
-											"color": "#c00"
-										}
-									})
-								);
+								// ソースの読み込み失敗イベント
+								onerror();
 							},
+						})
+					)
+				).append(
+					$("<div>", {
+						class: "GM_fwip_time_container",
+						css: {
+							"font-size": "6pt",
+							postion: "relative",
+							"text-align": "right",
+							color: "#fff",
+						}
+					}).append(
+						$("<span>", {
+							class: "GM_fwip_time_current"
+						})
+					).append(
+						$("<span>").text("/")
+					).append(
+						$("<span>", {
+							class: "GM_fwip_time_duration",
 						})
 					)
 				);
 				$("body").append($video);
+				// 動画の長さを表示する
+				function showDuration(video) {
+					var webm_duration = parseTime(video.duration);
+					$(".GM_fwip_time_duration").text(webm_duration);
+				}
+				// 再生時間を表示する
+				function showCurrentTime(video) {
+					var currenttime = parseTime(video.currentTime);
+					$(".GM_fwip_time_current").text(currenttime);
+				}
+				// エラー表示
+				function onerror() {
+					$video.children().remove();
+					$video.append(
+						$("<p>", {
+							text: "動画が読み込めませんでした",
+							class: "GM_fwip_error",
+							css: {
+								"text-align": "center",
+								"background-color": "#fff",
+								"color": "#c00"
+							}
+						})
+					);
+				}
 			}
-			function removeFullPlayer() {
+			function hideFullPlayer() {
 				if ($video.length) {
 					$video.remove();
 				}
 			}
+		}
+		// 秒をhh:mm:ss形式で返す
+		function parseTime(sec) {
+			var date = new Date(0,0,0,0,0,sec);
+			var time = 
+				("0" + date.getHours()).slice( -2 ) + ":" +
+				("0" + date.getMinutes()).slice( -2 ) + ":" +
+				("0" + date.getSeconds()).slice( -2 );
+			return time;
 		}
 	}
 
