@@ -5,7 +5,7 @@
 // @author      himuro_majika
 // @include     http://may.2chan.net/webm/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
-// @version     1.2
+// @version     1.3
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -17,8 +17,18 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	/**
 	 * 設定
 	 */
+	// フルサイズプレーヤーを有効にする(4chanライクな表示)
+	var USE_FULLPLAYER = true;
 	// ループ再生を有効にする
 	var USE_LOOP = true;
+	// 自動再生を有効にする(ミニサイズプレーヤー使用時)
+	var USE_AUTOPLAY = false;
+	// コントロールを表示する(ミニサイズプレーヤー使用時)
+	var USE_CONTROLS = true;
+	// ミュート状態で再生する
+	var USE_MUTED = false;
+	// フルサイズプレーヤーに時間を表示する
+	var USE_TIME_DISPLAY = true;
 	
 	
 	init();
@@ -63,14 +73,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		}
 		// 挿入されたレス
 		function replaceNodeInserted($nodes) {
-			var $res_inserted;
+			var $res_inserted = $nodes.find("td > a > img");
 			if (AKAHUKU) {
-				$res_inserted = $nodes.find("td > a > img");
 				if ($res_inserted.length) {
 					replaceNode($res_inserted);
 				}
 			} else if (FUTAKURO) {
-				$res_inserted = $nodes.find("td > a > img");
 				$res_inserted.each(function(){
 					replaceNode($(this));
 				});
@@ -85,29 +93,170 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			var width = node.attr("width");
 			var height = node.attr("height");
+			var timer;
 			// マウスオーバーで読み込み
 			node.hover(function(){
-				var $video = $("<video>", {
-					controls: "",
-					loop: USE_LOOP,
-					class: "GM_fwip_player",
+				if (USE_FULLPLAYER) {
+					timer = setTimeout(function(){
+						showFullPlayer();
+					}, 300);
+				} else {
+					addMiniPlayer();
+				}
+			},function(){
+				if (USE_FULLPLAYER) {
+					clearTimeout(timer);
+					hideFullPlayer();
+				}
+			});
+			// ミニプレイヤー
+			function addMiniPlayer() {
+				var $videoContainer = $("<div>", {
+					class: "GM_fwip_container_mini",
 					css: {
-						"width": width,
-						"height": height,
 						"margin": "0 20px",
 						"float": "left",
 						"clear": "left",
+					}
+				}).append(
+					$("<video>", {
+						class: "GM_fwip_player",
+						css: {
+							"width": width,
+							"height": height,
+						},
+					}).prop({
+						controls: USE_CONTROLS,
+						autoplay: USE_AUTOPLAY,
+						loop: USE_LOOP,
+						muted: USE_MUTED,
+					}).append(
+						$("<source>", {
+							src: href,
+							type: "video/webm",
+						})
+					)
+				);
+				// サムネイル画像を隠す
+				node.hide();
+				node.parent().before($videoContainer);
+			}
+			// フルプレイヤーを表示する
+			function showFullPlayer() {
+				hideFullPlayer();
+				// サムネ右端のオフセット
+				var offset = parseInt(node.offset().left) + parseInt(width);
+				var $videoContainer = $("<div>", {
+					class: "GM_fwip_container_full",
+					css: {
+						"background-color": "#000",
+						"position": "fixed",
+						"top": "20px",
+						"right": "20px",
+						// "border": "5px solid #333",
+						// "border-radius": "5px",
+						"box-shadow": "0 0 10px 5px rgba(0,0,0,0.5)",
+						"z-index": "2000000013",
+					}
+				});
+				var $videoPlayer = $("<video>", {
+					class: "GM_fwip_player",
+					css: {
+						"width": "auto",
+						"height": "auto",
+						"max-width": $(window).width() - offset - 40,
+						"max-height": $(window).height() - 40,
 					},
+				}).prop({
+					autoplay: true,
+					loop: USE_LOOP,
+					muted: USE_MUTED,
+					preload: true,
 				}).append(
 					$("<source>", {
 						src: href,
 						type: "video/webm",
+						error: function() {
+							// ソースの読み込み失敗イベント
+							onerror();
+						},
 					})
 				);
-				// サムネイル画像を隠す
-				node.hide();
-				node.parent().replaceWith($video);
-			});
+				$videoContainer.append($videoPlayer);
+				if (USE_TIME_DISPLAY) {
+					$videoPlayer.on("loadedmetadata", function(){
+						// メタデータ読み込み完了イベント
+						showDuration($(this).get(0));
+					}).on("timeupdate", function() {
+						// 再生位置変更イベント
+						showCurrentTime($(this).get(0));
+					});
+					$videoContainer.append(
+						$("<div>", {
+							class: "GM_fwip_time_container",
+							css: {
+								"font-size": "6pt",
+								"font-family": "arial,helvetica,sans-serif",
+								postion: "relative",
+								"text-align": "right",
+								color: "#fff",
+							}
+						}).append(
+							$("<span>", {
+								class: "GM_fwip_time_current"
+							})
+						).append(
+							$("<span>").text("/")
+						).append(
+							$("<span>", {
+								class: "GM_fwip_time_duration",
+							})
+						)
+					);
+				}
+				$("body").append($videoContainer);
+				// 動画の長さを表示する
+				function showDuration(video) {
+					var webm_duration = parseTime(video.duration);
+					$(".GM_fwip_time_duration").text(webm_duration);
+				}
+				// 再生時間を表示する
+				function showCurrentTime(video) {
+					var currenttime = parseTime(video.currentTime);
+					$(".GM_fwip_time_current").text(currenttime);
+				}
+				// エラー表示
+				function onerror() {
+					$videoContainer.children().remove();
+					$videoContainer.append(
+						$("<p>", {
+							text: "動画が読み込めませんでした",
+							class: "GM_fwip_error",
+							css: {
+								"text-align": "center",
+								"background-color": "#fff",
+								"color": "#c00"
+							}
+						})
+					);
+				}
+			}
+			// フルプレーヤーを消す
+			function hideFullPlayer() {
+				var $container = $(".GM_fwip_container_full");
+				if ($container.length) {
+					$container.remove();
+				}
+			}
+		}
+		// 秒をhh:mm:ss形式で返す
+		function parseTime(sec) {
+			var date = new Date(0,0,0,0,0,sec);
+			var time = 
+				("0" + date.getHours()).slice( -2 ) + ":" +
+				("0" + date.getMinutes()).slice( -2 ) + ":" +
+				("0" + date.getSeconds()).slice( -2 );
+			return time;
 		}
 	}
 
