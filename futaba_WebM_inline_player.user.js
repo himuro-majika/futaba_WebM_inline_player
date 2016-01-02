@@ -23,7 +23,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_LOOP = true;
 	// 自動再生を有効にする(ミニサイズプレーヤー使用時)
 	var USE_AUTOPLAY = false;
-	// コントロールを表示する
+	// コントロールを表示する(ミニサイズプレーヤー使用時)
 	var USE_CONTROLS = true;
 	// ミュート状態で再生する
 	var USE_MUTED = false;
@@ -140,11 +140,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				node.hide();
 				node.parent().before($video);
 			}
-			// フルプレイヤー
+			// フルプレイヤーを表示する
 			function showFullPlayer() {
-				if ($video.length) {
-					$video.remove();
-				}
+				hideFullPlayer();
 				// サムネ右端のオフセット
 				var offset = parseInt(node.offset().left) + parseInt(width);
 				$video = $("<div>", {
@@ -194,6 +192,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						class: "GM_fwip_time_container",
 						css: {
 							"font-size": "6pt",
+							"font-family": "arial,helvetica,sans-serif",
 							postion: "relative",
 							"text-align": "right",
 							color: "#fff",
@@ -237,9 +236,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					);
 				}
 			}
+			// フルプレーヤーを消す
 			function hideFullPlayer() {
-				if ($video.length) {
-					$video.remove();
+				var $container = $(".GM_fwip_container_full");
+				if ($container.length) {
+					$container.remove();
 				}
 			}
 		}
