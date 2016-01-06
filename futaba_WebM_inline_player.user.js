@@ -5,6 +5,7 @@
 // @author      himuro_majika
 // @include     http://may.2chan.net/webm/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
 // @version     1.3
 // @grant       none
 // @run-at      document-idle
@@ -33,6 +34,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	
 	init();
 	function init() {
+		config();
 		var AKAHUKU = false, FUTAKURO = false;
 		// 赤福が有効か
 		if ($("#akahuku_thumbnail").length) { AKAHUKU = true; }
@@ -165,7 +167,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						"width": "auto",
 						"height": "auto",
 						"max-width": $(window).width() - offset - 40,
-						"max-height": $(window).height() - 40,
+						"max-height": $(window).height() - 50,
 					},
 				}).prop({
 					autoplay: true,
@@ -248,6 +250,68 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					$container.remove();
 				}
 			}
+		}
+		// 設定
+		function config() {
+			// 設定画面
+			GM_config.init("futaba WebM inline player設定", {
+				"USE_LOOP" : {
+					"section": ["共通"],
+					"label" : "ループ再生を有効にする",
+					"type" : "checkbox",
+					"default" : USE_LOOP
+				},
+				"USE_MUTED" : {
+					"label" : "ミュート状態で再生する",
+					"type" : "checkbox",
+					"default" : USE_MUTED
+				},
+				"USE_FULLPLAYER" : {
+					"section": ["フルサイズプレーヤー"],
+					"label" : "フルサイズプレーヤーを使用する",
+					"type" : "checkbox",
+					"default" : USE_FULLPLAYER
+				},
+				"USE_TIME_DISPLAY" : {
+					"label" : "時間を表示する",
+					"type" : "checkbox",
+					"default" : USE_TIME_DISPLAY
+				},
+				"USE_AUTOPLAY" : {
+					"section": ["ミニサイズプレーヤー"],
+					"label" : "自動再生を有効にする",
+					"type" : "checkbox",
+					"default" : USE_AUTOPLAY
+				},
+				"USE_CONTROLS" : {
+					"label" : "コントロールを表示する",
+					"type" : "checkbox",
+					"default" : USE_CONTROLS
+				},
+			});
+			// 設定値読み込み
+			USE_FULLPLAYER = GM_config.get("USE_FULLPLAYER");
+			USE_LOOP = GM_config.get("USE_LOOP");
+			USE_AUTOPLAY = GM_config.get("USE_AUTOPLAY");
+			USE_CONTROLS = GM_config.get("USE_CONTROLS");
+			USE_MUTED = GM_config.get("USE_MUTED");
+			USE_TIME_DISPLAY = GM_config.get("USE_TIME_DISPLAY");
+			// 設定ボタンの表示
+			$("body > table").before(
+				$("<span>", {
+					id: "GM_fwip_configButton",
+				}).append(
+					$("<a>", {
+						text: "[futaba WebM inline player設定]",
+						css: {
+							cursor: "pointer",
+						},
+						click : function(){
+							GM_config.open();
+						}
+					})
+				)
+			);
 		}
 		// 秒をhh:mm:ss形式で返す
 		function parseTime(sec) {
