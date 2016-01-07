@@ -3,7 +3,9 @@
 // @namespace   https://github.com/himuro-majika
 // @description WebMをページ内で再生しちゃう
 // @author      himuro_majika
-// @include     http://may.2chan.net/webm/*
+// @include     http://may.2chan.net/webm/
+// @include     http://may.2chan.net/webm/futaba.htm
+// @include     http://may.2chan.net/webm/res/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
 // @version     1.3
