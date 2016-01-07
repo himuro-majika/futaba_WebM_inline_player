@@ -254,7 +254,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		// 設定
 		function config() {
 			// 設定画面
-			GM_config.init("futaba WebM inline player設定", {
+			GM_config.init("futaba WebM inline playerオプション<br>" +
+				"(設定反映には[Save]ボタン押下後にページの再読み込みが必要です)", {
 				"USE_LOOP" : {
 					"section": ["共通"],
 					"label" : "ループ再生を有効にする",
@@ -267,19 +268,19 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"default" : USE_MUTED
 				},
 				"USE_FULLPLAYER" : {
-					"section": ["フルサイズプレーヤー"],
+					"section": ["フルサイズプレーヤー(画面右上のスペースに表示される大きいサイズのプレーヤー)"],
 					"label" : "フルサイズプレーヤーを使用する",
 					"type" : "checkbox",
 					"default" : USE_FULLPLAYER
 				},
 				"USE_TIME_DISPLAY" : {
-					"label" : "時間を表示する",
+					"label" : "動画の下に再生時間を表示する",
 					"type" : "checkbox",
 					"default" : USE_TIME_DISPLAY
 				},
 				"USE_AUTOPLAY" : {
-					"section": ["ミニサイズプレーヤー"],
-					"label" : "自動再生を有効にする",
+					"section": ["ミニサイズプレーヤー(サムネ画像と置き換わる同サイズの小さいプレーヤー)"],
+					"label" : "自動再生を有効にする(マウスオーバーで即再生開始)",
 					"type" : "checkbox",
 					"default" : USE_AUTOPLAY
 				},
