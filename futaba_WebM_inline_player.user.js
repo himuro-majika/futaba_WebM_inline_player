@@ -7,7 +7,7 @@
 // @exclude     http://may.2chan.net/webm/futaba.php?mode=cat*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.4.1
+// @version     1.5
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -31,6 +31,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_MUTED = false;
 	// フルサイズプレーヤーに時間を表示する
 	var USE_TIME_DISPLAY = true;
+	// 再生速度変更を有効にする
+	var USE_PLAYBACK_RATE_CONTROL = true;
 	
 	
 	init();
@@ -96,22 +98,78 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			var width = node.attr("width");
 			var height = node.attr("height");
-			var timer;
+			var timer_show, timer_hide, timer_rate_hide;
 			// マウスオーバーで読み込み
 			node.hover(function(){
 				if (USE_FULLPLAYER) {
-					timer = setTimeout(function(){
+					clearTimeout(timer_rate_hide);
+					timer_show = setTimeout(function(){
 						showFullPlayer();
+						if (USE_PLAYBACK_RATE_CONTROL) {
+							showplaybackRateControl();
+						}
 					}, 300);
 				} else {
 					addMiniPlayer();
 				}
 			},function(){
 				if (USE_FULLPLAYER) {
-					clearTimeout(timer);
-					hideFullPlayer();
+					clearTimeout(timer_show);
+					timer_hide = setTimeout(function(){
+						hideFullPlayer();
+						if (USE_PLAYBACK_RATE_CONTROL) {
+							hideplaybackRateControl();
+						}
+					}, 300);
 				}
 			});
+			// 再生速度変更
+			function showplaybackRateControl() {
+				if ($("#GM_fwip_Rate_container").length) {
+					return;
+				}
+				node.parent().after(
+					$("<div>", {
+						id: "GM_fwip_Rate_container",
+						css: {
+							position: "absolute",
+							// "margin-top": "5px",
+							"margin-left": "20px",
+							"background-color": "rgba(0,0,0,0.3)",
+							"z-index": "100",
+							color: "#fff",
+						}
+				}).hover(function(){
+					clearTimeout(timer_hide);
+				}, function() {
+					timer_rate_hide = setTimeout(function() {
+						hideFullPlayer();
+						hideplaybackRateControl();
+					}, 300);
+				}).append(
+					$("<label>", {
+						text: "再生速度x",
+						for: "GM_fwip_Rate",
+					})
+				).append(
+					$("<input>", {
+						id: "GM_fwip_Rate",
+						type: "number",
+						step: "0.25",
+						max: "5.0",
+						min: "0.25",
+						value: "1.0",
+						css: {
+							width: "3em",
+							opacity: "0.7"
+						}
+					})
+				));
+			}
+			// 再生速度
+			function hideplaybackRateControl() {
+				$("#GM_fwip_Rate_container").remove();
+			}
 			// ミニプレイヤー
 			function addMiniPlayer() {
 				var $videoContainer = $("<div>", {
@@ -133,7 +191,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						autoplay: USE_AUTOPLAY,
 						loop: USE_LOOP,
 						muted: USE_MUTED,
-					}).append(
+					})
+					// .on("timeupdate", function(){
+					// 	// 再生速度変更
+					// 	$(this).prop("playbackRate", $("#GM_fwip_Rate").val());
+					// })
+					.append(
 						$("<source>", {
 							src: href,
 							type: "video/webm",
@@ -146,6 +209,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			// フルプレイヤーを表示する
 			function showFullPlayer() {
+				if ($("#GM_fwip_Rate_container").length) {
+					return;
+				}
 				hideFullPlayer();
 				// サムネ右端のオフセット
 				var offset = parseInt(node.offset().left) + parseInt(width);
@@ -175,6 +241,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					loop: USE_LOOP,
 					muted: USE_MUTED,
 					preload: true,
+					// playbackRate: "1.0",
 				}).append(
 					$("<source>", {
 						src: href,
@@ -186,6 +253,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					})
 				);
 				$videoContainer.append($videoPlayer);
+				if (USE_PLAYBACK_RATE_CONTROL) {
+					$videoPlayer.on("timeupdate", function() {
+						// 再生速度変更
+						$(this).prop("playbackRate", $("#GM_fwip_Rate").val());
+					});
+				}
 				if (USE_TIME_DISPLAY) {
 					$videoPlayer.on("loadedmetadata", function(){
 						// メタデータ読み込み完了イベント
@@ -279,6 +352,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"type" : "checkbox",
 					"default" : USE_TIME_DISPLAY
 				},
+				"USE_PLAYBACK_RATE_CONTROL" : {
+					"label" : "再生速度コントロールを有効にする(実験的)",
+					"type" : "checkbox",
+					"default" : USE_PLAYBACK_RATE_CONTROL
+				},
 				"USE_AUTOPLAY" : {
 					"section": ["ミニサイズプレーヤー(サムネ画像と置き換わる同サイズの小さいプレーヤー)"],
 					"label" : "自動再生を有効にする(マウスオーバーで即再生開始)",
@@ -298,6 +376,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			USE_CONTROLS = GM_config.get("USE_CONTROLS");
 			USE_MUTED = GM_config.get("USE_MUTED");
 			USE_TIME_DISPLAY = GM_config.get("USE_TIME_DISPLAY");
+			USE_PLAYBACK_RATE_CONTROL = GM_config.get("USE_PLAYBACK_RATE_CONTROL");
 			// 設定ボタンの表示
 			$("body > table").before(
 				$("<span>", {
