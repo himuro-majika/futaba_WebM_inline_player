@@ -31,6 +31,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_MUTED = false;
 	// フルサイズプレーヤーに時間を表示する
 	var USE_TIME_DISPLAY = true;
+	// 再生速度変更を有効にする
+	var USE_PLAYBACK_RATE_CONTROL = true;
 	
 	
 	init();
@@ -102,7 +104,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				if (USE_FULLPLAYER) {
 					timer_show = setTimeout(function(){
 						showFullPlayer();
-						showplaybackRateControl();
+						if (USE_PLAYBACK_RATE_CONTROL) {
+							showplaybackRateControl();
+						}
 					}, 300);
 				} else {
 					addMiniPlayer();
@@ -112,7 +116,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					clearTimeout(timer_show);
 					timer_hide = setTimeout(function(){
 						hideFullPlayer();
-						hideplaybackRateControl();
+						if (USE_PLAYBACK_RATE_CONTROL) {
+							hideplaybackRateControl();
+						}
 					}, 300);
 				}
 			});
@@ -180,10 +186,10 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						loop: USE_LOOP,
 						muted: USE_MUTED,
 					})
-					.on("timeupdate", function(){
-						// 再生速度変更
-						$(this).prop("playbackRate", $("#GM_fwip_Rate").val());
-					})
+					// .on("timeupdate", function(){
+					// 	// 再生速度変更
+					// 	$(this).prop("playbackRate", $("#GM_fwip_Rate").val());
+					// })
 					.append(
 						$("<source>", {
 							src: href,
@@ -241,6 +247,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					})
 				);
 				$videoContainer.append($videoPlayer);
+				if (USE_PLAYBACK_RATE_CONTROL) {
+					$videoPlayer.on("timeupdate", function() {
+						// 再生速度変更
+						$(this).prop("playbackRate", $("#GM_fwip_Rate").val());
+					});
+				}
 				if (USE_TIME_DISPLAY) {
 					$videoPlayer.on("loadedmetadata", function(){
 						// メタデータ読み込み完了イベント
@@ -248,8 +260,6 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					}).on("timeupdate", function() {
 						// 再生位置変更イベント
 						showCurrentTime($(this).get(0));
-						// 再生速度変更
-						$(this).prop("playbackRate", $("#GM_fwip_Rate").val());
 					});
 					$videoContainer.append(
 						$("<div>", {
@@ -325,11 +335,6 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"type" : "checkbox",
 					"default" : USE_MUTED
 				},
-				"Rate" : {
-					"label" : "Rate",
-					"type" : "number",
-					"default" : "1.0"
-				},
 				"USE_FULLPLAYER" : {
 					"section": ["フルサイズプレーヤー(画面右上のスペースに表示される大きいサイズのプレーヤー)"],
 					"label" : "フルサイズプレーヤーを使用する",
@@ -340,6 +345,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"label" : "動画の下に再生時間を表示する",
 					"type" : "checkbox",
 					"default" : USE_TIME_DISPLAY
+				},
+				"USE_PLAYBACK_RATE_CONTROL" : {
+					"label" : "再生速度コントロールを有効にする(実験的)",
+					"type" : "checkbox",
+					"default" : USE_PLAYBACK_RATE_CONTROL
 				},
 				"USE_AUTOPLAY" : {
 					"section": ["ミニサイズプレーヤー(サムネ画像と置き換わる同サイズの小さいプレーヤー)"],
@@ -360,6 +370,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			USE_CONTROLS = GM_config.get("USE_CONTROLS");
 			USE_MUTED = GM_config.get("USE_MUTED");
 			USE_TIME_DISPLAY = GM_config.get("USE_TIME_DISPLAY");
+			USE_PLAYBACK_RATE_CONTROL = GM_config.get("USE_PLAYBACK_RATE_CONTROL");
 			// 設定ボタンの表示
 			$("body > table").before(
 				$("<span>", {
