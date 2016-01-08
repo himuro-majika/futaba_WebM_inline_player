@@ -98,10 +98,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			var width = node.attr("width");
 			var height = node.attr("height");
-			var timer_show, timer_hide;
+			var timer_show, timer_hide, timer_rate_hide;
 			// マウスオーバーで読み込み
 			node.hover(function(){
 				if (USE_FULLPLAYER) {
+					clearTimeout(timer_rate_hide);
 					timer_show = setTimeout(function(){
 						showFullPlayer();
 						if (USE_PLAYBACK_RATE_CONTROL) {
@@ -132,14 +133,19 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						id: "GM_fwip_Rate_container",
 						css: {
 							position: "absolute",
-							// "margin-top": "20px",
+							// "margin-top": "5px",
 							"margin-left": "20px",
 							"background-color": "rgba(0,0,0,0.3)",
 							"z-index": "100",
 							color: "#fff",
 						}
-				}).on("mouseover", function(){
+				}).hover(function(){
 					clearTimeout(timer_hide);
+				}, function() {
+					timer_rate_hide = setTimeout(function() {
+						hideFullPlayer();
+						hideplaybackRateControl();
+					}, 300);
 				}).append(
 					$("<label>", {
 						text: "再生速度x",
