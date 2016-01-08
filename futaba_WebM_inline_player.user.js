@@ -96,22 +96,68 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			var width = node.attr("width");
 			var height = node.attr("height");
-			var timer;
+			var timer_show, timer_hide;
 			// マウスオーバーで読み込み
 			node.hover(function(){
 				if (USE_FULLPLAYER) {
-					timer = setTimeout(function(){
+					timer_show = setTimeout(function(){
 						showFullPlayer();
+						showplaybackRateControl();
 					}, 300);
 				} else {
 					addMiniPlayer();
 				}
 			},function(){
 				if (USE_FULLPLAYER) {
-					clearTimeout(timer);
-					hideFullPlayer();
+					clearTimeout(timer_show);
+					timer_hide = setTimeout(function(){
+						hideFullPlayer();
+						hideplaybackRateControl();
+					}, 300);
 				}
 			});
+			// 再生速度変更
+			function showplaybackRateControl() {
+				if ($("#GM_fwip_Rate_container").length) {
+					return;
+				}
+				node.parent().after(
+					$("<div>", {
+						id: "GM_fwip_Rate_container",
+						css: {
+							position: "absolute",
+							// "margin-top": "20px",
+							"margin-left": "20px",
+							"background-color": "rgba(0,0,0,0.3)",
+							"z-index": "100",
+							color: "#fff",
+						}
+				}).on("mouseover", function(){
+					clearTimeout(timer_hide);
+				}).append(
+					$("<label>", {
+						text: "再生速度x",
+						for: "GM_fwip_Rate",
+					})
+				).append(
+					$("<input>", {
+						id: "GM_fwip_Rate",
+						type: "number",
+						step: "0.25",
+						max: "5.0",
+						min: "0.25",
+						value: "1.0",
+						css: {
+							width: "3em",
+							opacity: "0.5"
+						}
+					})
+				));
+			}
+			// 再生速度
+			function hideplaybackRateControl() {
+				$("#GM_fwip_Rate_container").remove();
+			}
 			// ミニプレイヤー
 			function addMiniPlayer() {
 				var $videoContainer = $("<div>", {
@@ -133,7 +179,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						autoplay: USE_AUTOPLAY,
 						loop: USE_LOOP,
 						muted: USE_MUTED,
-					}).append(
+					})
+					.on("timeupdate", function(){
+						// 再生速度変更
+						$(this).prop("playbackRate", $("#GM_fwip_Rate").val());
+					})
+					.append(
 						$("<source>", {
 							src: href,
 							type: "video/webm",
@@ -146,6 +197,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			// フルプレイヤーを表示する
 			function showFullPlayer() {
+				if ($("#GM_fwip_Rate_container").length) {
+					return;
+				}
 				hideFullPlayer();
 				// サムネ右端のオフセット
 				var offset = parseInt(node.offset().left) + parseInt(width);
@@ -175,6 +229,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					loop: USE_LOOP,
 					muted: USE_MUTED,
 					preload: true,
+					// playbackRate: "1.0",
 				}).append(
 					$("<source>", {
 						src: href,
@@ -193,6 +248,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					}).on("timeupdate", function() {
 						// 再生位置変更イベント
 						showCurrentTime($(this).get(0));
+						// 再生速度変更
+						$(this).prop("playbackRate", $("#GM_fwip_Rate").val());
 					});
 					$videoContainer.append(
 						$("<div>", {
@@ -267,6 +324,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"label" : "ミュート状態で再生する",
 					"type" : "checkbox",
 					"default" : USE_MUTED
+				},
+				"Rate" : {
+					"label" : "Rate",
+					"type" : "number",
+					"default" : "1.0"
 				},
 				"USE_FULLPLAYER" : {
 					"section": ["フルサイズプレーヤー(画面右上のスペースに表示される大きいサイズのプレーヤー)"],
