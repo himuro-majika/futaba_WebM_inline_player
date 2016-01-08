@@ -155,7 +155,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						value: "1.0",
 						css: {
 							width: "3em",
-							opacity: "0.5"
+							opacity: "0.7"
 						}
 					})
 				));
