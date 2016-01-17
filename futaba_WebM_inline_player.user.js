@@ -3,8 +3,8 @@
 // @namespace   https://github.com/himuro-majika
 // @description WebMをページ内で再生しちゃう
 // @author      himuro_majika
-// @include     http://may.2chan.net/webm/*
-// @exclude     http://may.2chan.net/webm/futaba.php?mode=cat*
+// @include     http://*.2chan.net/*/*
+// @exclude     http://*.2chan.net/*/futaba.php?mode=cat*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
 // @version     1.5
@@ -34,7 +34,6 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	// 再生速度変更を有効にする
 	var USE_PLAYBACK_RATE_CONTROL = true;
 	
-	
 	init();
 	function init() {
 		config();
@@ -45,6 +44,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		if ($("#master").length) { FUTAKURO = true; }
 		getImgNodeThread();
 		getImgNodeRes();
+		if (AKAHUKU) {
+			getAutoLinkURL();
+		}
 		if (AKAHUKU || FUTAKURO) {
 			observeInserted();
 		}
@@ -62,6 +64,13 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		function getImgNodeRes() {
 			var $res_a = $(".rtd > a > img");
 			$res_a.each(function() {
+				replaceNode($(this));
+			});
+		}
+		// オートリンクURL
+		function getAutoLinkURL() {
+			var $link = $(".akahuku_generated_link");
+			$link.each(function() {
 				replaceNode($(this));
 			});
 		}
@@ -92,11 +101,19 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		// ノードの書き換え
 		function replaceNode(node) {
 			var href = node.parent().attr("href");
+			if (node.attr("dummyhref")) {
+				// オートリンク
+				href = node.attr("dummyhref");
+			}
 			if (!href.match(/\.webm$/)) {
 				// 拡張子.webm以外
 				return;
 			}
 			var width = node.attr("width");
+			if (!width) {
+				// オートリンク
+				width = node.parent().get(0).clientWidth;
+			}
 			var height = node.attr("height");
 			var timer_show, timer_hide, timer_rate_hide;
 			// マウスオーバーで読み込み
@@ -128,8 +145,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				if ($("#GM_fwip_Rate_container").length) {
 					return;
 				}
-				node.parent().after(
-					$("<div>", {
+				var $rateContainer = $("<div>", {
 						id: "GM_fwip_Rate_container",
 						css: {
 							position: "absolute",
@@ -164,7 +180,13 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 							opacity: "0.7"
 						}
 					})
-				));
+				);
+				if (node.attr("dummyhref")) {
+					// オートリンク
+					node.after($rateContainer);
+				} else {
+					node.parent().after($rateContainer);				
+				}
 			}
 			// 再生速度
 			function hideplaybackRateControl() {
