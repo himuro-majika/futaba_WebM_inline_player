@@ -33,6 +33,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_TIME_DISPLAY = true;
 	// 再生速度変更を有効にする
 	var USE_PLAYBACK_RATE_CONTROL = true;
+	// 赤福のオートリンクにも反応する
+	var USE_AUTOLINK = true;
 	
 	init();
 	function init() {
@@ -44,7 +46,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		if ($("#master").length) { FUTAKURO = true; }
 		getImgNodeThread();
 		getImgNodeRes();
-		if (AKAHUKU) {
+		if (AKAHUKU && USE_AUTOLINK) {
 			getAutoLinkURL();
 		}
 		if (AKAHUKU || FUTAKURO) {
@@ -226,8 +228,15 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					)
 				);
 				// サムネイル画像を隠す
-				node.hide();
-				node.parent().before($videoContainer);
+				if (node.attr("dummyhref")) {
+					// オートリンク
+					if (!node.parent().parent().children(".GM_fwip_container_mini").length) {
+						node.parent().before($videoContainer);
+					}
+				} else {
+					node.hide();
+					node.parent().before($videoContainer);
+				}
 			}
 			// フルプレイヤーを表示する
 			function showFullPlayer() {
@@ -363,6 +372,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"type" : "checkbox",
 					"default" : USE_MUTED
 				},
+				"USE_AUTOLINK" : {
+					"label" : "赤福のオートリンクにも反応する(Firefoxのみ)",
+					"type" : "checkbox",
+					"default" : USE_AUTOLINK
+				},
 				"USE_FULLPLAYER" : {
 					"section": ["フルサイズプレーヤー(画面右上のスペースに表示される大きいサイズのプレーヤー)"],
 					"label" : "フルサイズプレーヤーを使用する",
@@ -399,6 +413,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			USE_MUTED = GM_config.get("USE_MUTED");
 			USE_TIME_DISPLAY = GM_config.get("USE_TIME_DISPLAY");
 			USE_PLAYBACK_RATE_CONTROL = GM_config.get("USE_PLAYBACK_RATE_CONTROL");
+			USE_AUTOLINK = GM_config.get("USE_AUTOLINK");
 			// 設定ボタンの表示
 			$("body > table").before(
 				$("<span>", {
