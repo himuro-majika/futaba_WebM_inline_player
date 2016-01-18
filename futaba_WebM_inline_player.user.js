@@ -71,7 +71,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		}
 		// オートリンクURL
 		function getAutoLinkURL() {
-			var $link = $(".akahuku_generated_link");
+			var $link = $("blockquote > .akahuku_generated_link");
 			$link.each(function() {
 				replaceNode($(this));
 			});
