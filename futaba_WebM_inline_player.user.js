@@ -3,11 +3,11 @@
 // @namespace   https://github.com/himuro-majika
 // @description WebMをページ内で再生しちゃう
 // @author      himuro_majika
-// @include     http://may.2chan.net/webm/*
-// @exclude     http://may.2chan.net/webm/futaba.php?mode=cat*
+// @include     http://*.2chan.net/*/*
+// @exclude     http://*.2chan.net/*/futaba.php?mode=cat*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.5
+// @version     1.6
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -33,7 +33,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_TIME_DISPLAY = true;
 	// 再生速度変更を有効にする
 	var USE_PLAYBACK_RATE_CONTROL = true;
-	
+	// 赤福のオートリンクにも反応する
+	var USE_AUTOLINK = true;
 	
 	init();
 	function init() {
@@ -45,6 +46,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		if ($("#master").length) { FUTAKURO = true; }
 		getImgNodeThread();
 		getImgNodeRes();
+		if (AKAHUKU && USE_AUTOLINK) {
+			getAutoLinkURL();
+		}
 		if (AKAHUKU || FUTAKURO) {
 			observeInserted();
 		}
@@ -62,6 +66,13 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		function getImgNodeRes() {
 			var $res_a = $(".rtd > a > img");
 			$res_a.each(function() {
+				replaceNode($(this));
+			});
+		}
+		// オートリンクURL
+		function getAutoLinkURL() {
+			var $link = $("blockquote > .akahuku_generated_link");
+			$link.each(function() {
 				replaceNode($(this));
 			});
 		}
@@ -92,11 +103,19 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		// ノードの書き換え
 		function replaceNode(node) {
 			var href = node.parent().attr("href");
+			if (node.attr("dummyhref")) {
+				// オートリンク
+				href = node.attr("dummyhref");
+			}
 			if (!href.match(/\.webm$/)) {
 				// 拡張子.webm以外
 				return;
 			}
 			var width = node.attr("width");
+			if (!width) {
+				// オートリンク
+				width = node.parent().get(0).clientWidth;
+			}
 			var height = node.attr("height");
 			var timer_show, timer_hide, timer_rate_hide;
 			// マウスオーバーで読み込み
@@ -128,8 +147,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				if ($("#GM_fwip_Rate_container").length) {
 					return;
 				}
-				node.parent().after(
-					$("<div>", {
+				var $rateContainer = $("<div>", {
 						id: "GM_fwip_Rate_container",
 						css: {
 							position: "absolute",
@@ -164,7 +182,13 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 							opacity: "0.7"
 						}
 					})
-				));
+				);
+				if (node.attr("dummyhref")) {
+					// オートリンク
+					node.after($rateContainer);
+				} else {
+					node.parent().after($rateContainer);				
+				}
 			}
 			// 再生速度
 			function hideplaybackRateControl() {
@@ -204,8 +228,15 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					)
 				);
 				// サムネイル画像を隠す
-				node.hide();
-				node.parent().before($videoContainer);
+				if (node.attr("dummyhref")) {
+					// オートリンク
+					if (!node.parent().parent().children(".GM_fwip_container_mini").length) {
+						node.parent().before($videoContainer);
+					}
+				} else {
+					node.hide();
+					node.parent().before($videoContainer);
+				}
 			}
 			// フルプレイヤーを表示する
 			function showFullPlayer() {
@@ -341,6 +372,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"type" : "checkbox",
 					"default" : USE_MUTED
 				},
+				"USE_AUTOLINK" : {
+					"label" : "赤福のオートリンクにも反応する(Firefoxのみ)",
+					"type" : "checkbox",
+					"default" : USE_AUTOLINK
+				},
 				"USE_FULLPLAYER" : {
 					"section": ["フルサイズプレーヤー(画面右上のスペースに表示される大きいサイズのプレーヤー)"],
 					"label" : "フルサイズプレーヤーを使用する",
@@ -377,6 +413,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			USE_MUTED = GM_config.get("USE_MUTED");
 			USE_TIME_DISPLAY = GM_config.get("USE_TIME_DISPLAY");
 			USE_PLAYBACK_RATE_CONTROL = GM_config.get("USE_PLAYBACK_RATE_CONTROL");
+			USE_AUTOLINK = GM_config.get("USE_AUTOLINK");
 			// 設定ボタンの表示
 			$("body > table").before(
 				$("<span>", {
