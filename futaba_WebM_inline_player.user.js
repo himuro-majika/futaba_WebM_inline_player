@@ -7,7 +7,7 @@
 // @exclude     http://*.2chan.net/*/futaba.php?mode=cat*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.5
+// @version     1.6
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
