@@ -99,6 +99,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					replaceNode($(this));
 				});
 			}
+			// オートリンク
+			var $autolink_inserted = $nodes.find("blockquote > .akahuku_generated_link");
+			if ($autolink_inserted.length) {
+				replaceNode($autolink_inserted);
+			}
 		}
 		// ノードの書き換え
 		function replaceNode(node) {
