@@ -2,23 +2,25 @@
 ## なにコレ
 ブラウザ上で動くUserscriptです  
 
-ふたば☆ちゃんねるWebM板のWebM動画をページ内でインラインで表示します。  
+ふたば☆ちゃんねるでWebM動画をページ内でインラインで表示します。  
 
-Firefox + [Greasemonkey](https://addons.mozilla.org/ja/firefox/addon/greasemonkey/),  
-Chrome + [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo),  
-Opera(ver.15+) + [Tampermonkey](https://addons.opera.com/extensions/details/tampermonkey-beta/)  
-で動作確認済みです
+Firefoxの場合、[Greasemonkey](https://addons.mozilla.org/ja/firefox/addon/greasemonkey/)を先にインスールしてからスクリプトをインストールして下さい  
+Chromeの場合、[Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)を先にインスールしてからスクリプトをインストールして下さい  
+Opera(ver.15+)の場合、[Tampermonkey](https://addons.opera.com/extensions/details/tampermonkey-beta/)を先にインスールしてからスクリプトをインストールして下さい  
 
 ※このUserscriptは[赤福Firefox SP](http://toshiakisp.github.io/akahuku-firefox-sp/)と[ふたクロ](http://futakuro.com/)に対応しています。
 
 
 ## 使い方
-動画のサムネイルにマウスを乗せると動作します。  
+動画のサムネイルにマウスを乗せると動作します  
 ページ左上のボタンから設定変更できます  
+
+URLのオートリンク文字列にも反応します(赤福Firefox SPを使用している場合)
 
 ## オプション設定  
 * ループ再生
 * ミュート状態で再生
+* 赤福のオートリンクに反応(Firefoxのみ)
 * フルサイズプレーヤー(画面右上のスペースに表示される大きいサイズのプレーヤー)
 
   - 動画の下に再生時間を表示
@@ -28,6 +30,9 @@ Opera(ver.15+) + [Tampermonkey](https://addons.opera.com/extensions/details/tamp
   - コントロールの表示
 
 ## 更新履歴
+* v1.6 2016-01-19
+  - 赤福のオートリンク文字列上でも使用可能に
+  - オートリンク文字列のサポートに伴い動作対象をすべての板に変更
 * v1.5 2016-01-09
   - オプションにフルサイズプレーヤー使用時の再生速度コントロールを追加しました(実験的)  
 	※ブラウザの種類・動画の内容によってうまく動かない場合があります
