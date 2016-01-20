@@ -8,7 +8,7 @@
 // @exclude     http://*.2chan.net/bin/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.6.2
+// @version     1.6.3
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -423,7 +423,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			USE_PLAYBACK_RATE_CONTROL = GM_config.get("USE_PLAYBACK_RATE_CONTROL");
 			USE_AUTOLINK = GM_config.get("USE_AUTOLINK");
 			// 設定ボタンの表示
-			$("body > table").before(
+			$("body > table:not([class])").before(
 				$("<span>", {
 					id: "GM_fwip_configButton",
 				}).append(
