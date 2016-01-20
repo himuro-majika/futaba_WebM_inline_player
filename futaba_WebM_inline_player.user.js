@@ -47,7 +47,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		if ($("#master").length) { FUTAKURO = true; }
 		getImgNodeThread();
 		getImgNodeRes();
-		if (AKAHUKU && USE_AUTOLINK) {
+		if ((AKAHUKU || FUTAKURO) && USE_AUTOLINK) {
 			getAutoLinkURL();
 		}
 		if (AKAHUKU || FUTAKURO) {
@@ -72,7 +72,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		}
 		// オートリンクURL
 		function getAutoLinkURL() {
-			var $link = $("blockquote > .akahuku_generated_link");
+			var $link = $("blockquote > a");
 			$link.each(function() {
 				replaceNode($(this));
 			});
@@ -101,8 +101,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				});
 			}
 			// オートリンク
-			var $autolink_inserted = $nodes.find("blockquote > .akahuku_generated_link");
-			if ($autolink_inserted.length) {
+			var $autolink_inserted = $nodes.find("blockquote > a");
+			if (USE_AUTOLINK && $autolink_inserted.length) {
 				replaceNode($autolink_inserted);
 			}
 		}
@@ -112,6 +112,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			if (node.attr("dummyhref")) {
 				// オートリンク
 				href = node.attr("dummyhref");
+			} else if (node.attr("href")) {
+				href = node.attr("href");
 			}
 			if (!href.match(/\.webm$/)) {
 				// 拡張子.webm以外
@@ -189,7 +191,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						}
 					})
 				);
-				if (node.attr("dummyhref")) {
+				if (node.attr("dummyhref") || node.attr("href")) {
 					// オートリンク
 					node.after($rateContainer);
 				} else {
@@ -234,7 +236,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					)
 				);
 				// サムネイル画像を隠す
-				if (node.attr("dummyhref")) {
+				if (node.attr("dummyhref") || node.attr("href")) {
 					// オートリンク
 					if (!node.parent().parent().children(".GM_fwip_container_mini").length) {
 						node.parent().before($videoContainer);
@@ -379,7 +381,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"default" : USE_MUTED
 				},
 				"USE_AUTOLINK" : {
-					"label" : "赤福のオートリンクにも反応する(Firefoxのみ)",
+					"label" : "赤福・ふたクロのオートリンク文字列に反応する",
 					"type" : "checkbox",
 					"default" : USE_AUTOLINK
 				},
