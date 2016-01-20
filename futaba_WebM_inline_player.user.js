@@ -423,7 +423,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			USE_PLAYBACK_RATE_CONTROL = GM_config.get("USE_PLAYBACK_RATE_CONTROL");
 			USE_AUTOLINK = GM_config.get("USE_AUTOLINK");
 			// 設定ボタンの表示
-			$("body > table").before(
+			$("body > table:not([class])").before(
 				$("<span>", {
 					id: "GM_fwip_configButton",
 				}).append(
