@@ -211,6 +211,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						"float": "left",
 						"clear": "left",
 					}
+				}).hover(function(){
+					if (USE_AUTOPLAY) {
+						$(this).find(".GM_fwip_player").get(0).play();
+					}
+				},function(){
 				}).append(
 					$("<video>", {
 						class: "GM_fwip_player",
