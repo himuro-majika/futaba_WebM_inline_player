@@ -8,7 +8,7 @@
 // @exclude     http://*.2chan.net/bin/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.6.3
+// @version     1.7
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -211,6 +211,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						"float": "left",
 						"clear": "left",
 					}
+				}).hover(function(){
+					if (USE_AUTOPLAY) {
+						$(this).find(".GM_fwip_player").get(0).play();
+					}
+				},function(){
 				}).append(
 					$("<video>", {
 						class: "GM_fwip_player",
