@@ -122,7 +122,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			var width = node.attr("width");
 			if (!width) {
 				// オートリンク
-				width = node.parent().get(0).clientWidth;
+				width = node.get(0).offsetWidth;
 			}
 			var height = node.attr("height");
 			var timer_show, timer_hide, timer_rate_hide;
@@ -204,6 +204,14 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			// ミニプレイヤー
 			function addMiniPlayer() {
+				if (
+					( node.attr("dummyhref") || node.attr("href") ) &&
+					node.parent().parent().get(0).tagName == "FORM" &&
+					width < 250
+				) {
+					// スレ本文のオートリンク
+					width = 250;
+				}
 				var $videoContainer = $("<div>", {
 					class: "GM_fwip_container_mini",
 					css: {
