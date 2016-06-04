@@ -36,7 +36,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_PLAYBACK_RATE_CONTROL = true;
 	// 赤福のオートリンクにも反応する
 	var USE_AUTOLINK = true;
-	
+
 	init();
 	function init() {
 		config();
@@ -55,9 +55,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		}
 		// スレ画
 		function getImgNodeThread() {
-			var $sure_a = $(".thre").length
-				? $(".thre > a > img")
-				: $("body > form > a > img");
+			var $sure_a = $(".thre").length ?
+				$(".thre > a > img") :
+				$("body > form > a > img");
 			if (FUTAKURO) { // ふたクロ
 				$sure_a = $("#master > a > img");
 			}
@@ -197,7 +197,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					// オートリンク
 					node.after($rateContainer);
 				} else {
-					node.parent().after($rateContainer);				
+					node.parent().after($rateContainer);
 				}
 			}
 			// 再生速度
@@ -457,7 +457,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		// 秒をhh:mm:ss形式で返す
 		function parseTime(sec) {
 			var date = new Date(0,0,0,0,0,sec);
-			var time = 
+			var time =
 				("0" + date.getHours()).slice( -2 ) + ":" +
 				("0" + date.getMinutes()).slice( -2 ) + ":" +
 				("0" + date.getSeconds()).slice( -2 );
