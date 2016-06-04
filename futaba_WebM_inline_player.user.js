@@ -443,7 +443,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					id: "GM_fwip_configButton",
 				}).append(
 					$("<a>", {
-						text: "[futaba WebM inline player設定]",
+						text: "[WebM設定]",
 						css: {
 							cursor: "pointer",
 						},
