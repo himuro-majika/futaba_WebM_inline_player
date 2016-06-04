@@ -8,7 +8,7 @@
 // @exclude     http://*.2chan.net/bin/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.7
+// @version     1.7.1
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -36,7 +36,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_PLAYBACK_RATE_CONTROL = true;
 	// 赤福のオートリンクにも反応する
 	var USE_AUTOLINK = true;
-	
+
 	init();
 	function init() {
 		config();
@@ -55,7 +55,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		}
 		// スレ画
 		function getImgNodeThread() {
-			var $sure_a = $("body > form > a > img");
+			var $sure_a = $(".thre").length ?
+				$(".thre > a > img") :
+				$("body > form > a > img");
 			if (FUTAKURO) { // ふたクロ
 				$sure_a = $("#master > a > img");
 			}
@@ -122,7 +124,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			var width = node.attr("width");
 			if (!width) {
 				// オートリンク
-				width = node.parent().get(0).clientWidth;
+				width = node.get(0).offsetWidth;
 			}
 			var height = node.attr("height");
 			var timer_show, timer_hide, timer_rate_hide;
@@ -195,7 +197,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					// オートリンク
 					node.after($rateContainer);
 				} else {
-					node.parent().after($rateContainer);				
+					node.parent().after($rateContainer);
 				}
 			}
 			// 再生速度
@@ -204,6 +206,14 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			// ミニプレイヤー
 			function addMiniPlayer() {
+				if (
+					( node.attr("dummyhref") || node.attr("href") ) &&
+					node.parent().parent().get(0).tagName == "FORM" &&
+					width < 250
+				) {
+					// スレ本文のオートリンク
+					width = 250;
+				}
 				var $videoContainer = $("<div>", {
 					class: "GM_fwip_container_mini",
 					css: {
@@ -433,7 +443,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					id: "GM_fwip_configButton",
 				}).append(
 					$("<a>", {
-						text: "[futaba WebM inline player設定]",
+						text: "[WebM設定]",
 						css: {
 							cursor: "pointer",
 						},
@@ -447,7 +457,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		// 秒をhh:mm:ss形式で返す
 		function parseTime(sec) {
 			var date = new Date(0,0,0,0,0,sec);
-			var time = 
+			var time =
 				("0" + date.getHours()).slice( -2 ) + ":" +
 				("0" + date.getMinutes()).slice( -2 ) + ":" +
 				("0" + date.getSeconds()).slice( -2 );
