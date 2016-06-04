@@ -55,7 +55,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		}
 		// スレ画
 		function getImgNodeThread() {
-			var $sure_a = $("body > form > a > img");
+			var $sure_a = $(".thre").length
+				? $(".thre > a > img")
+				: $("body > form > a > img");
 			if (FUTAKURO) { // ふたクロ
 				$sure_a = $("#master > a > img");
 			}
