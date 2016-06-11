@@ -8,7 +8,7 @@
 // @exclude     http://*.2chan.net/bin/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.7.1
+// @version     1.7.2
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -81,7 +81,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		}
 		// 続きを読むで挿入される要素を監視
 		function observeInserted() {
-			var target = $("html > body > form[action]:not([enctype])").get(0);
+			var target = $(".thre").length ?
+				$(".thre").get(0) :
+				$("html > body > form[action]:not([enctype])").get(0);
 			var observer = new MutationObserver(function(mutations) {
 				mutations.forEach(function(mutation) {
 					var $nodes = $(mutation.addedNodes);
