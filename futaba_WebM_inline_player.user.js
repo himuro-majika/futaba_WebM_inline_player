@@ -28,6 +28,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_AUTOPLAY = false;
 	// コントロールを表示する(ミニサイズプレーヤー使用時)
 	var USE_CONTROLS = true;
+	// デフォルトの音量
+	var DEFAULT_VOLUME = 100;
 	// ミュート状態で再生する
 	var USE_MUTED = false;
 	// フルサイズプレーヤーに時間を表示する
@@ -240,6 +242,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						autoplay: USE_AUTOPLAY,
 						loop: USE_LOOP,
 						muted: USE_MUTED,
+						volume: DEFAULT_VOLUME / 100,
 					})
 					// .on("timeupdate", function(){
 					// 	// 再生速度変更
@@ -297,6 +300,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					loop: USE_LOOP,
 					muted: USE_MUTED,
 					preload: true,
+					volume: DEFAULT_VOLUME / 100,
 					// playbackRate: "1.0",
 				}).append(
 					$("<source>", {
@@ -392,6 +396,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"type" : "checkbox",
 					"default" : USE_LOOP
 				},
+				"DEFAULT_VOLUME" : {
+					"label" : "デフォルトの音量（範囲は0～100。ミュートの設定が優先されます。）",
+					"type" : "int",
+					"default" : DEFAULT_VOLUME
+				},
 				"USE_MUTED" : {
 					"label" : "ミュート状態で再生する",
 					"type" : "checkbox",
@@ -435,6 +444,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			USE_LOOP = GM_config.get("USE_LOOP");
 			USE_AUTOPLAY = GM_config.get("USE_AUTOPLAY");
 			USE_CONTROLS = GM_config.get("USE_CONTROLS");
+			if (!GM_config.get("DEFAULT_VOLUME") || GM_config.get("DEFAULT_VOLUME") > 100) {
+				DEFAULT_VOLUME = 100;
+				GM_config.set("DEFAULT_VOLUME", 100);
+			} else {
+				DEFAULT_VOLUME = GM_config.get("DEFAULT_VOLUME");
+			}
 			USE_MUTED = GM_config.get("USE_MUTED");
 			USE_TIME_DISPLAY = GM_config.get("USE_TIME_DISPLAY");
 			USE_PLAYBACK_RATE_CONTROL = GM_config.get("USE_PLAYBACK_RATE_CONTROL");
