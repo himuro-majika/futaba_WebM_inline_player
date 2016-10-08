@@ -28,6 +28,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_AUTOPLAY = false;
 	// コントロールを表示する(ミニサイズプレーヤー使用時)
 	var USE_CONTROLS = true;
+	var USE_LIMIT_SIZE = false;
 	// デフォルトの音量
 	var DEFAULT_VOLUME = 100;
 	// ミュート状態で再生する
@@ -38,7 +39,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	var USE_PLAYBACK_RATE_CONTROL = true;
 	// 赤福のオートリンクにも反応する
 	var USE_AUTOLINK = true;
-
+	
 	init();
 	function init() {
 		config();
@@ -132,6 +133,38 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			}
 			var height = node.attr("height");
 			var timer_show, timer_hide, timer_rate_hide;
+			
+			
+			//クリックイベント
+			document.removeEventListener('click', thumbonclick, false);
+			node.click(function(event) {
+				var thumb = node.get(0);
+				webmopen(thumb);
+				var video = node.parent().parent().find(".extendWebm");
+				var videoDiv = video.parent();
+				console.log(videoDiv);
+				videoDiv.css({
+					"margin": "0 20px",
+					"float": "left",
+					"clear": "left",
+				});
+				if (USE_LIMIT_SIZE) {
+					video.css({
+						"width": width,
+						"height": height,
+					});					
+				}
+				video.prop({
+					controls: USE_CONTROLS,
+					// autoplay: USE_AUTOPLAY,
+					loop: USE_LOOP,
+					muted: USE_MUTED,
+					volume: DEFAULT_VOLUME / 100,
+				});
+				return false;
+			});
+
+			
 			// マウスオーバーで読み込み
 			node.hover(function(){
 				if (USE_FULLPLAYER) {
@@ -143,7 +176,32 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 						}
 					}, 300);
 				} else {
-					addMiniPlayer();
+					if (USE_AUTOPLAY) {
+						var thumb = node.get(0);
+						webmopen(thumb);
+						var video = node.parent().parent().find(".extendWebm");
+						var videoDiv = video.parent();
+						videoDiv.css({
+							"margin": "0 20px",
+							"float": "left",
+							"clear": "left",
+						});
+						if (USE_LIMIT_SIZE) {
+							video.css({
+								"width": width,
+								"height": height,
+							});					
+						}
+						video.prop({
+							controls: USE_CONTROLS,
+							// autoplay: USE_AUTOPLAY,
+							loop: USE_LOOP,
+							muted: USE_MUTED,
+							volume: DEFAULT_VOLUME / 100,
+						});
+					}
+
+					// addMiniPlayer();
 				}
 			},function(){
 				if (USE_FULLPLAYER) {
@@ -438,6 +496,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					"type" : "checkbox",
 					"default" : USE_CONTROLS
 				},
+				"USE_LIMIT_SIZE" : {
+					"label" : "動画のサイズをサムネサイズに制限する",
+					"type" : "checkbox",
+					"default" : USE_LIMIT_SIZE
+				}
 			});
 			// 設定値読み込み
 			USE_FULLPLAYER = GM_config.get("USE_FULLPLAYER");
@@ -454,6 +517,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			USE_TIME_DISPLAY = GM_config.get("USE_TIME_DISPLAY");
 			USE_PLAYBACK_RATE_CONTROL = GM_config.get("USE_PLAYBACK_RATE_CONTROL");
 			USE_AUTOLINK = GM_config.get("USE_AUTOLINK");
+			USE_LIMIT_SIZE = GM_config.get("USE_LIMIT_SIZE");
 			// 設定ボタンの表示
 			$("body > table:not([class])").before(
 				$("<span>", {
