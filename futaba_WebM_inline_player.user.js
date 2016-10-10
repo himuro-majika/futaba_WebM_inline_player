@@ -280,6 +280,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				} else {
 					this.pause();
 				}
+			}).hover(function() {
+				if (USE_AUTOPLAY && !USE_LOOP) {
+					this.play();
+				}
+			}, function() {
 			});
 		}
 		// フルプレイヤーを表示する
