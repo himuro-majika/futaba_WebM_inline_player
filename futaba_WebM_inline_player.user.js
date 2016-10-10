@@ -8,7 +8,7 @@
 // @exclude     http://*.2chan.net/bin/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.8.0
+// @version     1.9.1
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -136,9 +136,15 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	function closeOnClick() {
 		$(document).click(function(event) {
 			if (event.target.className != "extendWebm") {
-				$("div.cancelbk").each(function() {
-					$(this).get(0).click();
-				});
+				if ($(event.target).parents(".akahuku_reply_popup").length > 0) {
+					// akahuku_reply_popup
+					// replaceNode($(event.target));
+					// return false;
+				} else {
+					$("div.cancelbk").each(function() {
+						$(this).get(0).click();
+					});
+				}
 			}
 		});
 	}
@@ -167,28 +173,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		//クリックイベント
 		// document.removeEventListener('click', thumbonclick, false);
 		node.click(function(event) {
-			var thumb = node.get(0);
-			webmopen(thumb);
-			var video = node.parent().parent().find(".extendWebm");
-			var videoDiv = video.parent();
-			videoDiv.css({
-				"margin": "0 20px",
-				"float": "left",
-				"clear": "left",
-			});
-			if (USE_LIMIT_SIZE) {
-				video.css({
-					"width": width,
-					"height": height,
-				});
-			}
-			video.prop({
-				controls: USE_CONTROLS,
-				// autoplay: USE_AUTOPLAY,
-				loop: USE_LOOP,
-				muted: USE_MUTED,
-				volume: DEFAULT_VOLUME / 100,
-			});
+			addMiniPlayer(node);
 			return false;
 		});
 
@@ -204,32 +189,11 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					}
 				}, 300);
 			} else {
-				if (USE_AUTOPLAY) {
-					var thumb = node.get(0);
-					webmopen(thumb);
-					var video = node.parent().parent().find(".extendWebm");
-					var videoDiv = video.parent();
-					videoDiv.css({
-						"margin": "0 20px",
-						"float": "left",
-						"clear": "left",
-					});
-					if (USE_LIMIT_SIZE) {
-						video.css({
-							"width": width,
-							"height": height,
-						});
-					}
-					video.prop({
-						controls: USE_CONTROLS,
-						// autoplay: USE_AUTOPLAY,
-						loop: USE_LOOP,
-						muted: USE_MUTED,
-						volume: DEFAULT_VOLUME / 100,
-					});
+				if (node.attr("dummyhref") || node.attr("href")) {
+					addMiniPlayerAutoLink();
+				} else if (USE_AUTOPLAY) {
+					addMiniPlayer(node);
 				}
-
-				// addMiniPlayer();
 			}
 		},function(){
 			if (USE_FULLPLAYER) {
@@ -295,7 +259,44 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			$("#GM_fwip_Rate_container").remove();
 		}
 		// ミニプレイヤー
-		function addMiniPlayer() {
+		function addMiniPlayer(node) {
+			var thumb = node.get(0);
+			webmopen(thumb);
+			var video = node.parent().parent().find(".extendWebm");
+			var videoDiv = video.parent();
+			videoDiv.css({
+				"margin": "0 20px",
+				"float": "left",
+				"clear": "left",
+			});
+			if (USE_LIMIT_SIZE) {
+				video.css({
+					"width": width,
+					"height": height,
+				});
+			}
+			video.prop({
+				controls: USE_CONTROLS,
+				// autoplay: USE_AUTOPLAY,
+				loop: USE_LOOP,
+				muted: USE_MUTED,
+				volume: DEFAULT_VOLUME / 100,
+			}).click(function(event) {
+				//動画クリックでplay/pauseトグル(Chrome用)
+				if (this.paused) {
+					this.play();
+				} else {
+					this.pause();
+				}
+			}).hover(function() {
+				if (USE_AUTOPLAY && !USE_LOOP) {
+					this.play();
+				}
+			}, function() {
+			});
+		}
+		
+		function addMiniPlayerAutoLink() {
 			if (
 				( node.attr("dummyhref") || node.attr("href") ) &&
 				node.parent().parent().get(0).tagName == "FORM" &&
@@ -329,6 +330,13 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					loop: USE_LOOP,
 					muted: USE_MUTED,
 					volume: DEFAULT_VOLUME / 100,
+				}).click(function(event) {
+					//動画クリックでplay/pauseトグル(Chrome用)
+					if (this.paused) {
+						this.play();
+					} else {
+						this.pause();
+					}
 				})
 				// .on("timeupdate", function(){
 				// 	// 再生速度変更
