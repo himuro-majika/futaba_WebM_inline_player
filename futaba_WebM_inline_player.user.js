@@ -136,9 +136,15 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 	function closeOnClick() {
 		$(document).click(function(event) {
 			if (event.target.className != "extendWebm") {
-				$("div.cancelbk").each(function() {
-					$(this).get(0).click();
-				});
+				if ($(event.target).parents(".akahuku_reply_popup").length > 0) {
+					// akahuku_reply_popup
+					// replaceNode($(event.target));
+					// return false;
+				} else {
+					$("div.cancelbk").each(function() {
+						$(this).get(0).click();
+					});
+				}
 			}
 		});
 	}
