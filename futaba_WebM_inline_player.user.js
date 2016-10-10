@@ -321,8 +321,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				$("<video>", {
 					class: "GM_fwip_player",
 					css: {
-						"width": width,
-						"height": height,
+						"width": USE_LIMIT_SIZE ? width : "",
+						"height": USE_LIMIT_SIZE ? height : "",
 					},
 				}).prop({
 					controls: USE_CONTROLS,
