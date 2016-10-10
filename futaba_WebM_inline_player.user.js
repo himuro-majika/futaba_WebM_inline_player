@@ -189,7 +189,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					}
 				}, 300);
 			} else {
-				if (USE_AUTOPLAY) {
+				if (node.attr("dummyhref") || node.attr("href")) {
+					addMiniPlayerAutoLink();
+				} else if (USE_AUTOPLAY) {
 					addMiniPlayer(node);
 				}
 			}
@@ -292,6 +294,71 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				}
 			}, function() {
 			});
+		}
+		
+		function addMiniPlayerAutoLink() {
+			if (
+				( node.attr("dummyhref") || node.attr("href") ) &&
+				node.parent().parent().get(0).tagName == "FORM" &&
+				width < 250
+			) {
+				// スレ本文のオートリンク
+				width = 250;
+			}
+			var $videoContainer = $("<div>", {
+				class: "GM_fwip_container_mini",
+				css: {
+					"margin": "0 20px",
+					"float": "left",
+					"clear": "left",
+				}
+			}).hover(function(){
+				if (USE_AUTOPLAY) {
+					$(this).find(".GM_fwip_player").get(0).play();
+				}
+			},function(){
+			}).append(
+				$("<video>", {
+					class: "GM_fwip_player",
+					css: {
+						"width": width,
+						"height": height,
+					},
+				}).prop({
+					controls: USE_CONTROLS,
+					autoplay: USE_AUTOPLAY,
+					loop: USE_LOOP,
+					muted: USE_MUTED,
+					volume: DEFAULT_VOLUME / 100,
+				}).click(function(event) {
+					//動画クリックでplay/pauseトグル(Chrome用)
+					if (this.paused) {
+						this.play();
+					} else {
+						this.pause();
+					}
+				})
+				// .on("timeupdate", function(){
+				// 	// 再生速度変更
+				// 	$(this).prop("playbackRate", $("#GM_fwip_Rate").val());
+				// })
+				.append(
+					$("<source>", {
+						src: href,
+						type: "video/webm",
+					})
+				)
+			);
+			// サムネイル画像を隠す
+			if (node.attr("dummyhref") || node.attr("href")) {
+				// オートリンク
+				if (!node.parent().parent().children(".GM_fwip_container_mini").length) {
+					node.parent().before($videoContainer);
+				}
+			} else {
+				node.hide();
+				node.parent().before($videoContainer);
+			}
 		}
 		// フルプレイヤーを表示する
 		function showFullPlayer() {
