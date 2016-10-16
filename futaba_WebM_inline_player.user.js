@@ -283,10 +283,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				volume: DEFAULT_VOLUME / 100,
 			}).click(function(event) {
 				//動画クリックでplay/pauseトグル(Chrome用)
-				if (this.paused) {
-					this.play();
-				} else {
-					this.pause();
+				if (navigator.userAgent.indexOf("Firefox") == -1) {
+					if (this.paused) {
+						this.play();
+					} else {
+						this.pause();
+					}
 				}
 			}).hover(function() {
 				if (USE_AUTOPLAY && !USE_LOOP) {
@@ -332,10 +334,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					volume: DEFAULT_VOLUME / 100,
 				}).click(function(event) {
 					//動画クリックでplay/pauseトグル(Chrome用)
-					if (this.paused) {
-						this.play();
-					} else {
-						this.pause();
+					if (navigator.userAgent.indexOf("Firefox") == -1) {
+						if (this.paused) {
+							this.play();
+						} else {
+							this.pause();
+						}
 					}
 				})
 				// .on("timeupdate", function(){
