@@ -4,11 +4,14 @@
 // @description WebMをページ内で再生しちゃう
 // @author      himuro_majika
 // @include     http://*.2chan.net/*/*
+// @include     https://*.2chan.net/*/*
 // @exclude     http://*.2chan.net/*/futaba.php?mode=cat*
+// @exclude     https://*.2chan.net/*/futaba.php?mode=cat*
 // @exclude     http://*.2chan.net/bin/*
+// @exclude     https://*.2chan.net/bin/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.9.1
+// @version     1.9.2
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -283,10 +286,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				volume: DEFAULT_VOLUME / 100,
 			}).click(function(event) {
 				//動画クリックでplay/pauseトグル(Chrome用)
-				if (this.paused) {
-					this.play();
-				} else {
-					this.pause();
+				if (navigator.userAgent.indexOf("Firefox") == -1) {
+					if (this.paused) {
+						this.play();
+					} else {
+						this.pause();
+					}
 				}
 			}).hover(function() {
 				if (USE_AUTOPLAY && !USE_LOOP) {
@@ -321,8 +326,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 				$("<video>", {
 					class: "GM_fwip_player",
 					css: {
-						"width": width,
-						"height": height,
+						"width": USE_LIMIT_SIZE ? width : "",
+						"height": USE_LIMIT_SIZE ? height : "",
 					},
 				}).prop({
 					controls: USE_CONTROLS,
@@ -332,10 +337,12 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 					volume: DEFAULT_VOLUME / 100,
 				}).click(function(event) {
 					//動画クリックでplay/pauseトグル(Chrome用)
-					if (this.paused) {
-						this.play();
-					} else {
-						this.pause();
+					if (navigator.userAgent.indexOf("Firefox") == -1) {
+						if (this.paused) {
+							this.play();
+						} else {
+							this.pause();
+						}
 					}
 				})
 				// .on("timeupdate", function(){
