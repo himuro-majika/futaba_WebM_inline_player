@@ -161,7 +161,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 			href = node.attr("href");
 		}
 		if (!href.match(/\.(webm|mp4)$/)) {
-			// 拡張子.webm以外
+			// 拡張子.webm, .mp4以外
 			return;
 		}
 		var width = node.attr("width");
