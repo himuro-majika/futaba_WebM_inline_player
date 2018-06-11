@@ -160,7 +160,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		} else if (node.attr("href")) {
 			href = node.attr("href");
 		}
-		if (!href.match(/\.webm$/)) {
+		if (!href.match(/\.(webm|mp4)$/)) {
 			// 拡張子.webm以外
 			return;
 		}
