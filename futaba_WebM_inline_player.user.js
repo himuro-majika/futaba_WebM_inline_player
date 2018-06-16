@@ -11,7 +11,7 @@
 // @exclude     https://*.2chan.net/bin/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.9.2
+// @version     1.10.0
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -160,8 +160,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		} else if (node.attr("href")) {
 			href = node.attr("href");
 		}
-		if (!href.match(/\.webm$/)) {
-			// 拡張子.webm以外
+		if (!href.match(/\.(webm|mp4)$/)) {
+			// 拡張子.webm, .mp4以外
 			return;
 		}
 		var width = node.attr("width");
