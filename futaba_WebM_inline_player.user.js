@@ -57,10 +57,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		if ((isAkahukuEnabled() || isFutakuroEnabled()) && USE_AUTOLINK) {
 			getAutoLinkURL();
 		}
-		if (isAkahukuEnabled() || isFutakuroEnabled()) {
-			observeInserted();
-			getResPopup();
-		}
+		observeInserted();
+		getResPopup();
 	}
 	// 赤福が有効か
 	function isAkahukuEnabled() {
