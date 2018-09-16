@@ -11,7 +11,7 @@
 // @exclude     https://*.2chan.net/bin/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require     https://greasyfork.org/scripts/1884-gm-config/code/GM_config.js?version=4836
-// @version     1.10.0
+// @version     1.10.1
 // @grant       none
 // @run-at      document-idle
 // @license     MIT
@@ -57,10 +57,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 		if ((isAkahukuEnabled() || isFutakuroEnabled()) && USE_AUTOLINK) {
 			getAutoLinkURL();
 		}
-		if (isAkahukuEnabled() || isFutakuroEnabled()) {
-			observeInserted();
-			getResPopup();
-		}
+		observeInserted();
+		getResPopup();
 	}
 	// 赤福が有効か
 	function isAkahukuEnabled() {
